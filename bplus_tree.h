@@ -77,8 +77,8 @@ is_tree_empty (bplus_tree_t *tree)
     if (!tree)
         return(true);
 
-    if (tree->num_leafs || tree->num_index)
-        return (false);
+    if (tree->root)
+      return (false);
 
     return(true);
 }

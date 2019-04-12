@@ -252,8 +252,9 @@ print_tree_util (bplus_tree_node_t *root)
 void
 print_tree (bplus_tree_t *tree)
 {
-  if (!tree)
+  if (!tree) {
     return;
+  }
 
   print_tree_util (tree->root);
   printf("\n");
@@ -466,18 +467,18 @@ bplus_tree_create_node (bool is_leaf)
  * free the memory of the allocated b tree
  */
 void
-bplus_tree_delete(bplus_tree_t *tree)
+bplus_tree_delete(bplus_tree_t **tree)
 {
-    if (!tree)
+    if (!*tree)
         return;
 
-    if (!is_tree_empty(tree)) {
+    if (!is_tree_empty(*tree)) {
         printf("%s>Error: trying to free a non-empty tree\n", __FUNCTION__);
         return;
     }
     
-    free(tree);
-    tree = NULL;
+    free(*tree);
+    *tree = NULL;
 }
 
 /*
@@ -550,7 +551,7 @@ get_child_index (bplus_tree_node_t *node, int key)
 /*
  * Binary Serach for searching within a leaf node
  */
-static bool
+static int
 binary_search (pair_t *pairs,
                int key,
                float *data,
@@ -559,13 +560,12 @@ binary_search (pair_t *pairs,
     int mid = 0;
 
     if (start > end)
-        return (false);
+        return (-1);
     
-    //TODO: avoid overflow
     mid = (start + end)/2;
     if (pairs[mid].key == key) {
         *data = pairs[mid].data;
-        return (true);
+        return (mid);
     }
 
     if (key < pairs[mid].key) {
@@ -574,13 +574,13 @@ binary_search (pair_t *pairs,
         return (binary_search(pairs, key, data, mid + 1, end));
     }
 
-    return (false);
+    return (-1);
 }
 
 /*
  * utility function to search a key within a leaf node
  */
-static bool
+static int
 bplus_tree_search_in_leaf (bplus_tree_node_t *node,
                            int key,
                            float *data)
@@ -589,7 +589,7 @@ bplus_tree_search_in_leaf (bplus_tree_node_t *node,
 
     if (!node->is_leaf) {
         printf("%s> Error: node is not a leaf\n", __FUNCTION__);
-        return (false);
+        return (-1);
     }
 
     return binary_search(node->u.leaf->pairs,
@@ -613,8 +613,15 @@ bplus_tree_search_key_internal(bplus_tree_node_t *root,
         return (false);
     }
 
+    print_node(root);
+
     if (root->is_leaf) {
-        return (bplus_tree_search_in_leaf(root, key, data));
+        index = bplus_tree_search_in_leaf(root, key, data);
+        if (index == -1) {
+          return (false);
+        } else {
+          return (true);
+        }
     }
 
     index = get_child_index(root, key);
@@ -704,6 +711,7 @@ bplus_tree_range_search_in_leaf (bplus_tree_node_t *root,
   int num = 0;
   int index = 0;
   pair_t *pairs;
+  bool found = false;
 
   if (!root->is_leaf) {
     
@@ -715,13 +723,6 @@ bplus_tree_range_search_in_leaf (bplus_tree_node_t *root,
   lowest_key_in_leaf = root->u.leaf->pairs[0].key;
   highest_key_in_leaf = root->u.leaf->pairs[num - 1].key;
 
-  if ((low_key > highest_key_in_leaf) ||
-     high_key < lowest_key_in_leaf ) {
-    
-    printf("Range not found\n");
-    return;
-  }
-
   /*
    * print <key, values> in this leaf
    */
@@ -732,6 +733,9 @@ bplus_tree_range_search_in_leaf (bplus_tree_node_t *root,
     if (pairs[i].key > high_key) {
       goto done;
     }
+    
+    if (!false)
+      found = true;
     printf("<Key: %d, value: %f>\n", pairs[i]. key, pairs[i].data);
   }
 
@@ -749,12 +753,17 @@ bplus_tree_range_search_in_leaf (bplus_tree_node_t *root,
       if (pairs[i].key > high_key) {
         goto done;
       }
+      
+      if (!found)
+        found = true;
       printf("<Key: %d, value: %f>\n", pairs[i]. key, pairs[i].data);
     }
     head = head->u.leaf->next;
   }
  
 done:
+  if (!found)
+    printf("Range not found\n");
   return;
 }
 
@@ -1333,6 +1342,8 @@ bplus_tree_insert_internal (bplus_tree_node_t **root,
                             int key,
                             float value)
 {
+  int index = 0;
+  float data = 0;
   bplus_tree_node_t *leaf = NULL;
 
   /*
@@ -1355,6 +1366,16 @@ bplus_tree_insert_internal (bplus_tree_node_t **root,
      * Cannot happen ?
      */
     printf("%s: Error: could not find leaf for key %d\n", __FUNCTION__, key);
+    return;
+  }
+
+  /*
+   * if the key is already present modify the contents
+   */
+  index = bplus_tree_search_in_leaf(leaf, key, &data);
+  if (index != -1) {
+    
+    leaf->u.leaf->pairs[index].data = value;
     return;
   }
 
@@ -2169,137 +2190,15 @@ main ()
   int key = 0;
   float data = 0;
 
-  tree = bplus_tree_create(5);
+  tree = bplus_tree_create(3);
   if (!tree)
     return -1;
 
-#if 0
-bplus_tree_insert(tree,  1 , 1 );
-bplus_tree_insert(tree,  26 , 26 );
-bplus_tree_insert(tree,  51 , 51 );
-bplus_tree_insert(tree,  76 , 76 );
-bplus_tree_insert(tree,  101 , 101 );
-bplus_tree_insert(tree,  126 , 126 );
-bplus_tree_insert(tree,  151 , 151 );
-bplus_tree_insert(tree,  176 , 176 );
-bplus_tree_insert(tree,  201 , 201 );
-bplus_tree_insert(tree,  226 , 226 );
-bplus_tree_insert(tree,  251 , 251 );
-bplus_tree_insert(tree,  276 , 276 );
-bplus_tree_insert(tree,  301 , 301 );
-bplus_tree_insert(tree,  326 , 326 );
-bplus_tree_insert(tree,  351 , 351 );
-bplus_tree_insert(tree,  376 , 376 );
-bplus_tree_insert(tree,  401 , 401 );
-bplus_tree_insert(tree,  426 , 426 );
-bplus_tree_insert(tree,  451 , 451 );
-bplus_tree_insert(tree,  476 , 476 );
-bplus_tree_insert(tree,  501 , 501 );
-bplus_tree_insert(tree,  526 , 526 );
-bplus_tree_insert(tree,  551 , 551 );
-bplus_tree_insert(tree,  576 , 576 );
-bplus_tree_insert(tree,  601 , 601 );
-bplus_tree_insert(tree,  626 , 626 );
-bplus_tree_insert(tree,  651 , 651 );
-bplus_tree_insert(tree,  676 , 676 );
-bplus_tree_insert(tree,  701 , 701 );
-bplus_tree_insert(tree,  726 , 726 );
-bplus_tree_insert(tree,  751 , 751 );
-bplus_tree_insert(tree,  776 , 776 );
-bplus_tree_insert(tree,  801 , 801 );
-bplus_tree_insert(tree,  826 , 826 );
-bplus_tree_insert(tree,  851 , 851 );
-bplus_tree_insert(tree,  876 , 876 );
-bplus_tree_insert(tree,  901 , 901 );
-bplus_tree_insert(tree,  926 , 926 );
-bplus_tree_insert(tree,  976 , 976 );
-bplus_tree_insert(tree,  852 , 976 );
-bplus_tree_insert(tree,  853 , 976 );
-bplus_tree_insert(tree,  53 , 976 );
-bplus_tree_insert(tree,  54 , 976 );
-bplus_tree_insert(tree,  554 , 976 );
-bplus_tree_insert(tree,  555 , 976 );
-bplus_tree_insert(tree,  202 , 976 );
-bplus_tree_insert(tree,  203 , 976 );
-  
-
-  bplus_tree_delete_key(tree, 251);
-  bplus_tree_delete_key(tree, 226);
-  bplus_tree_delete_key(tree, 26);
-  bplus_tree_delete_key(tree, 1);
   print_tree(tree);
-  printf("\n********************\n");
-  
-  bplus_tree_delete_key(tree, 976);
-  bplus_tree_delete_key(tree, 901);
-  bplus_tree_delete_key(tree, 926);
-  bplus_tree_delete_key(tree, 876);
-  bplus_tree_delete_key(tree, 853);
-  bplus_tree_delete_key(tree, 852);
-  bplus_tree_delete_key(tree, 776);
-  bplus_tree_delete_key(tree, 751);
-  bplus_tree_delete_key(tree, 651);
-  bplus_tree_delete_key(tree, 676);
-  bplus_tree_delete_key(tree, 101);
-  bplus_tree_delete_key(tree, 126);
-  bplus_tree_delete_key(tree, 326);
-  bplus_tree_delete_key(tree, 301);
-  bplus_tree_delete_key(tree, 526);
-  bplus_tree_delete_key(tree, 501);
-  bplus_tree_delete_key(tree, 451);
-  bplus_tree_delete_key(tree, 476);
-  bplus_tree_delete_key(tree, 426);
-  bplus_tree_delete_key(tree, 801);
-  bplus_tree_delete_key(tree, 826);
-  bplus_tree_delete_key(tree, 851);
-  bplus_tree_delete_key(tree, 51);
-  bplus_tree_delete_key(tree, 53);
-  bplus_tree_delete_key(tree, 54);
-  bplus_tree_delete_key(tree, 76);
-  bplus_tree_delete_key(tree, 351);
-  bplus_tree_delete_key(tree, 376);
-  bplus_tree_delete_key(tree, 401);
-  bplus_tree_delete_key(tree, 555);
-  bplus_tree_delete_key(tree, 276);
-  bplus_tree_delete_key(tree, 701);
-  bplus_tree_delete_key(tree, 201);
-  bplus_tree_delete_key(tree, 176);
-  bplus_tree_delete_key(tree, 601);
-  bplus_tree_delete_key(tree, 626);
-  bplus_tree_delete_key(tree, 202);
-  bplus_tree_delete_key(tree, 203);
-  bplus_tree_delete_key(tree, 576);
-  bplus_tree_delete_key(tree, 726);
-  bplus_tree_delete_key(tree, 151);
-  bplus_tree_delete_key(tree, 554);
-  bplus_tree_delete_key(tree, 551);
 
+  bplus_tree_insert(tree, 1, 1);
   print_tree(tree);
- 
-  key = 51;
-  if (bplus_tree_search_key(tree, key, &data)) {
-    printf("key %d data %f\n", key, data);
-  } else {
-    printf("key %d not found\n");
-  }
+
   
-  key = 76;
-  if (bplus_tree_search_key(tree, key, &data)) {
-    printf("key %d data %f\n", key, data);
-  } else {
-    printf("key %d not found\n");
-  }
-
-  key = 926;
-  if (bplus_tree_search_key(tree, key, &data)) {
-    printf("key %d data %f\n", key, data);
-  } else {
-    printf("key %d not found\n");
-  }
-
-  printf("range search\n");
-  bplus_tree_range_search(tree, -1000, 1000);
-#endif
-
-  bplus_tree_delete(tree);
+  bplus_tree_delete(&tree);
 }
