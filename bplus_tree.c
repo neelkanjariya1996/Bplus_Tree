@@ -2196,7 +2196,6 @@ main ()
   int ret;
   int low_key = 0;
   int high_key = 0;
-  int i = 1;
 
 /*
   tree = bplus_tree_create(5);
@@ -2206,46 +2205,29 @@ main ()
   inp = fopen("input.txt", "r");
   while (ret = fgets(str, 100, inp)) {
 		 
-	printf("\nIteration: %d\n", i);
-	i++;
-	
 	if (ret == EOF)
 			break;
 
-	printf("string: %s\n", str);
-	
 	pch = strtok(str, "()\n");
-	printf("PCH before if statements: %s\n", pch);
 
 	if (!(strncmp(pch, "Initialize", 10))) {
-		printf("In initialize: ");
 		pch = strtok(NULL, "()\n");
-	printf("string: %s\n", str);
-		printf("PCH: %s\n", pch);
 		if (pch != NULL) {
 
 			tree = bplus_tree_create(atoi(pch));
-			printf("Order of the tree: %d\n", atoi(pch));
 		}
 		continue;
 	}
 
 	if (!(strncmp(pch, "Insert", 6))) {
 	
-		printf("In Insert: ");
 		pch = strtok (NULL, " ,()\n");
-	printf("string: %s\n", str);
 		if (pch != NULL) {
 			key = atoi(pch);
-			printf("Key: %d , ", key);
 		}
-		printf("PCH before strtok = %s\n", pch);
 		pch = strtok(NULL, ", )\n");
-	printf("string: %s\n", str);
-		printf("PCH after strtok = %s\n", pch);
 		if (pch != NULL) {
 			value = atof(pch);
-			printf(" Value: %lf \n", value);
 		}
 
 		bplus_tree_insert(tree, key, value);
@@ -2257,12 +2239,9 @@ main ()
 
 	if (!(strncmp(pch, "Delete", 6))) {
 
-		printf("In Delete ");
 		pch = strtok (NULL, "( )\n");
-	printf("string: %s\n", str);
 		if (pch != NULL) {
 				key = atoi(pch);
-				printf("Key: %d\n", key);
 	}
 		bplus_tree_delete_key(tree, key);
 		printf("\n***********************\n");
@@ -2272,36 +2251,20 @@ main ()
 
 	}
 	
-	printf("Outside search\n");
-	printf ("PCH: %s\n", pch);
-	printf("string: %s\n", str);
 	if (!(strncmp(pch, "Search", 6))) {
 		
-		printf("Inside search ");
 		pch = strtok (NULL, " ,()\n");
-		printf("PCH: %s\n", pch);
-	printf("string: %s\n", str);
 		if(pch != NULL) {
 				low_key = atoi(pch);
 				key = atoi(pch);
-				printf("Low_key = %d, Key = %d\n", low_key, key);
-				
 		}
 		pch = strtok (NULL, " ,()\n");
-	printf ("PCH: %s\n", pch);
-	printf("string: %s\n", str);
 		if (pch == NULL) {
-				printf("Calling bplus_tree_search_key: \n");
 				bplus_tree_search_key(tree, key, &data);
 		} else if (pch != NULL) {
 			high_key = atoi(pch);
-			printf("calling bplus_tree_range_search");
-			printf("High_key = %d\n", high_key);
 			bplus_tree_range_search (tree, low_key, high_key);
 		}
-		printf("\n***********************\n");
-  		print_tree(tree);
-		printf("\n***********************\n");
 		continue;
 	}
 
