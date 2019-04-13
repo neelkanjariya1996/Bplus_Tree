@@ -2189,16 +2189,627 @@ main ()
 {
   int key = 0;
   float data = 0;
+  double value = 0;
+  FILE *inp;
+  char str[100];
+  char *pch;
+  int ret;
+  int low_key = 0;
+  int high_key = 0;
+  int i = 1;
 
-  tree = bplus_tree_create(3);
+/*
+  tree = bplus_tree_create(5);
   if (!tree)
     return -1;
+*/  
+  inp = fopen("input.txt", "r");
+  while (ret = fgets(str, 100, inp)) {
+		 
+	printf("\nIteration: %d\n", i);
+	i++;
+	
+	if (ret == EOF)
+			break;
+
+	printf("string: %s\n", str);
+	
+	pch = strtok(str, "()\n");
+	printf("PCH before if statements: %s\n", pch);
+
+	if (!(strncmp(pch, "Initialize", 10))) {
+		printf("In initialize: ");
+		pch = strtok(NULL, "()\n");
+	printf("string: %s\n", str);
+		printf("PCH: %s\n", pch);
+		if (pch != NULL) {
+
+			tree = bplus_tree_create(atoi(pch));
+			printf("Order of the tree: %d\n", atoi(pch));
+		}
+		continue;
+	}
+
+	if (!(strncmp(pch, "Insert", 6))) {
+	
+		printf("In Insert: ");
+		pch = strtok (NULL, " ,()\n");
+	printf("string: %s\n", str);
+		if (pch != NULL) {
+			key = atoi(pch);
+			printf("Key: %d , ", key);
+		}
+		printf("PCH before strtok = %s\n", pch);
+		pch = strtok(NULL, ", )\n");
+	printf("string: %s\n", str);
+		printf("PCH after strtok = %s\n", pch);
+		if (pch != NULL) {
+			value = atof(pch);
+			printf(" Value: %lf \n", value);
+		}
+
+		bplus_tree_insert(tree, key, value);
+		printf("\n***********************\n");
+  		print_tree(tree);
+		printf("\n***********************\n");
+		continue;
+	}
+
+	if (!(strncmp(pch, "Delete", 6))) {
+
+		printf("In Delete ");
+		pch = strtok (NULL, "( )\n");
+	printf("string: %s\n", str);
+		if (pch != NULL) {
+				key = atoi(pch);
+				printf("Key: %d\n", key);
+	}
+		bplus_tree_delete_key(tree, key);
+		printf("\n***********************\n");
+  		print_tree(tree);
+		printf("\n***********************\n");
+		continue;
+
+	}
+	
+	printf("Outside search\n");
+	printf ("PCH: %s\n", pch);
+	printf("string: %s\n", str);
+	if (!(strncmp(pch, "Search", 6))) {
+		
+		printf("Inside search ");
+		pch = strtok (NULL, " ,()\n");
+		printf("PCH: %s\n", pch);
+	printf("string: %s\n", str);
+		if(pch != NULL) {
+				low_key = atoi(pch);
+				key = atoi(pch);
+				printf("Low_key = %d, Key = %d\n", low_key, key);
+				
+		}
+		pch = strtok (NULL, " ,()\n");
+	printf ("PCH: %s\n", pch);
+	printf("string: %s\n", str);
+		if (pch == NULL) {
+				printf("Calling bplus_tree_search_key: \n");
+				bplus_tree_search_key(tree, key, &data);
+		} else if (pch != NULL) {
+			high_key = atoi(pch);
+			printf("calling bplus_tree_range_search");
+			printf("High_key = %d\n", high_key);
+			bplus_tree_range_search (tree, low_key, high_key);
+		}
+		printf("\n***********************\n");
+  		print_tree(tree);
+		printf("\n***********************\n");
+		continue;
+	}
+
+  }
+
+#if 0
+  /********************
+   * INSERT TEST CASE
+   *******************/ 
+
+bplus_tree_insert(tree, 4, 4);
+bplus_tree_insert(tree, 9, 9);
+bplus_tree_insert(tree, 14, 14);
+bplus_tree_insert(tree, 19, 19);
+bplus_tree_insert(tree, 24, 24);
+bplus_tree_insert(tree, 29, 29);
+bplus_tree_insert(tree, 34, 34);
+bplus_tree_insert(tree, 39, 39);
+bplus_tree_insert(tree, 44, 44);
+bplus_tree_insert(tree, 49, 49);
+bplus_tree_insert(tree, 54, 54);
+bplus_tree_insert(tree, 59, 59);
+bplus_tree_insert(tree, 64, 64);
+bplus_tree_insert(tree, 69, 69);
+bplus_tree_insert(tree, 74, 74);
+bplus_tree_insert(tree, 79, 79);
+bplus_tree_insert(tree, 84, 84);
+bplus_tree_insert(tree, 89, 89);
+bplus_tree_insert(tree, 94, 94);
+bplus_tree_insert(tree, 99, 99);
+bplus_tree_insert(tree, 104, 104);
+bplus_tree_insert(tree, 109, 109);
+bplus_tree_insert(tree, 114, 114);
+bplus_tree_insert(tree, 119, 119);
+bplus_tree_insert(tree, 124, 124);
+bplus_tree_insert(tree, 129, 129);
+bplus_tree_insert(tree, 134, 134);
+bplus_tree_insert(tree, 139, 139);
+bplus_tree_insert(tree, 144, 144);
+bplus_tree_insert(tree, 149, 149);
+bplus_tree_insert(tree, 154, 154);
+bplus_tree_insert(tree, 159, 159);
+bplus_tree_insert(tree, 164, 164);
+bplus_tree_insert(tree, 169, 169);
+bplus_tree_insert(tree, 174, 174);
+bplus_tree_insert(tree, 179, 179);
+bplus_tree_insert(tree, 184, 184);
+bplus_tree_insert(tree, 189, 189);
+bplus_tree_insert(tree, 194, 194);
+bplus_tree_insert(tree, 199, 199);
+bplus_tree_insert(tree, 2, 2);
+bplus_tree_insert(tree, 7, 7);
+bplus_tree_insert(tree, 12, 12);
+bplus_tree_insert(tree, 17, 17);
+bplus_tree_insert(tree, 22, 22);
+bplus_tree_insert(tree, 27, 27);
+bplus_tree_insert(tree, 32, 32);
+bplus_tree_insert(tree, 37, 37);
+bplus_tree_insert(tree, 42, 42);
+bplus_tree_insert(tree, 47, 47);
+bplus_tree_insert(tree, 52, 52);
+bplus_tree_insert(tree, 57, 57);
+bplus_tree_insert(tree, 62, 62);
+bplus_tree_insert(tree, 67, 67);
+bplus_tree_insert(tree, 72, 72);
+bplus_tree_insert(tree, 77, 77);
+bplus_tree_insert(tree, 82, 82);
+bplus_tree_insert(tree, 87, 87);
+bplus_tree_insert(tree, 92, 92);
+bplus_tree_insert(tree, 97, 97);
+bplus_tree_insert(tree, 102, 102);
+bplus_tree_insert(tree, 107, 107);
+bplus_tree_insert(tree, 112, 112);
+bplus_tree_insert(tree, 117, 117);
+bplus_tree_insert(tree, 122, 122);
+bplus_tree_insert(tree, 127, 127);
+bplus_tree_insert(tree, 132, 132);
+bplus_tree_insert(tree, 137, 137);
+bplus_tree_insert(tree, 142, 142);
+bplus_tree_insert(tree, 147, 147);
+bplus_tree_insert(tree, 152, 152);
+bplus_tree_insert(tree, 157, 157);
+bplus_tree_insert(tree, 162, 162);
+bplus_tree_insert(tree, 167, 167);
+bplus_tree_insert(tree, 172, 172);
+bplus_tree_insert(tree, 177, 177);
+bplus_tree_insert(tree, 182, 182);
+bplus_tree_insert(tree, 187, 187);
+bplus_tree_insert(tree, 192, 192);
+bplus_tree_insert(tree, 197, 197);
+bplus_tree_insert(tree, 3, 3);
+bplus_tree_insert(tree, 8, 8);
+bplus_tree_insert(tree, 13, 13);
+bplus_tree_insert(tree, 18, 18);
+bplus_tree_insert(tree, 23, 23);
+bplus_tree_insert(tree, 28, 28);
+bplus_tree_insert(tree, 33, 33);
+bplus_tree_insert(tree, 38, 38);
+bplus_tree_insert(tree, 43, 43);
+bplus_tree_insert(tree, 48, 48);
+bplus_tree_insert(tree, 53, 53);
+bplus_tree_insert(tree, 58, 58);
+bplus_tree_insert(tree, 63, 63);
+bplus_tree_insert(tree, 68, 68);
+bplus_tree_insert(tree, 73, 73);
+bplus_tree_insert(tree, 78, 78);
+bplus_tree_insert(tree, 83, 83);
+bplus_tree_insert(tree, 88, 88);
+bplus_tree_insert(tree, 93, 93);
+bplus_tree_insert(tree, 98, 98);
+bplus_tree_insert(tree, 103, 103);
+bplus_tree_insert(tree, 108, 108);
+bplus_tree_insert(tree, 113, 113);
+bplus_tree_insert(tree, 118, 118);
+bplus_tree_insert(tree, 123, 123);
+bplus_tree_insert(tree, 128, 128);
+bplus_tree_insert(tree, 133, 133);
+bplus_tree_insert(tree, 138, 138);
+bplus_tree_insert(tree, 143, 143);
+bplus_tree_insert(tree, 148, 148);
+bplus_tree_insert(tree, 153, 153);
+bplus_tree_insert(tree, 158, 158);
+bplus_tree_insert(tree, 163, 163);
+bplus_tree_insert(tree, 168, 168);
+bplus_tree_insert(tree, 173, 173);
+bplus_tree_insert(tree, 178, 178);
+bplus_tree_insert(tree, 183, 183);
+bplus_tree_insert(tree, 188, 188);
+bplus_tree_insert(tree, 193, 193);
+bplus_tree_insert(tree, 198, 198);
+bplus_tree_insert(tree, 1, 1);
+bplus_tree_insert(tree, 6, 6);
+bplus_tree_insert(tree, 11, 11);
+bplus_tree_insert(tree, 16, 16);
+bplus_tree_insert(tree, 21, 21);
+bplus_tree_insert(tree, 26, 26);
+bplus_tree_insert(tree, 31, 31);
+bplus_tree_insert(tree, 36, 36);
+bplus_tree_insert(tree, 41, 41);
+bplus_tree_insert(tree, 46, 46);
+bplus_tree_insert(tree, 51, 51);
+bplus_tree_insert(tree, 56, 56);
+bplus_tree_insert(tree, 61, 61);
+bplus_tree_insert(tree, 66, 66);
+bplus_tree_insert(tree, 71, 71);
+bplus_tree_insert(tree, 76, 76);
+bplus_tree_insert(tree, 81, 81);
+bplus_tree_insert(tree, 86, 86);
+bplus_tree_insert(tree, 91, 91);
+bplus_tree_insert(tree, 96, 96);
+bplus_tree_insert(tree, 101, 101);
+bplus_tree_insert(tree, 106, 106);
+bplus_tree_insert(tree, 111, 111);
+bplus_tree_insert(tree, 116, 116);
+bplus_tree_insert(tree, 121, 121);
+bplus_tree_insert(tree, 126, 126);
+bplus_tree_insert(tree, 131, 131);
+bplus_tree_insert(tree, 136, 136);
+bplus_tree_insert(tree, 141, 141);
+bplus_tree_insert(tree, 146, 146);
+bplus_tree_insert(tree, 151, 151);
+bplus_tree_insert(tree, 156, 156);
+bplus_tree_insert(tree, 161, 161);
+bplus_tree_insert(tree, 166, 166);
+bplus_tree_insert(tree, 171, 171);
+bplus_tree_insert(tree, 176, 176);
+bplus_tree_insert(tree, 181, 181);
+bplus_tree_insert(tree, 186, 186);
+bplus_tree_insert(tree, 191, 191);
+bplus_tree_insert(tree, 196, 196);
+bplus_tree_insert(tree, 0, 0);
+bplus_tree_insert(tree, 5, 5);
+bplus_tree_insert(tree, 10, 10);
+bplus_tree_insert(tree, 15, 15);
+bplus_tree_insert(tree, 20, 20);
+bplus_tree_insert(tree, 25, 25);
+bplus_tree_insert(tree, 30, 30);
+bplus_tree_insert(tree, 35, 35);
+bplus_tree_insert(tree, 40, 40);
+bplus_tree_insert(tree, 45, 45);
+bplus_tree_insert(tree, 50, 50);
+bplus_tree_insert(tree, 55, 55);
+bplus_tree_insert(tree, 60, 60);
+bplus_tree_insert(tree, 65, 65);
+bplus_tree_insert(tree, 70, 70);
+bplus_tree_insert(tree, 75, 75);
+bplus_tree_insert(tree, 80, 80);
+bplus_tree_insert(tree, 85, 85);
+bplus_tree_insert(tree, 90, 90);
+bplus_tree_insert(tree, 95, 95);
+bplus_tree_insert(tree, 100, 100);
+bplus_tree_insert(tree, 105, 105);
+bplus_tree_insert(tree, 110, 110);
+bplus_tree_insert(tree, 115, 115);
+bplus_tree_insert(tree, 120, 120);
+bplus_tree_insert(tree, 125, 125);
+bplus_tree_insert(tree, 130, 130);
+bplus_tree_insert(tree, 135, 135);
+bplus_tree_insert(tree, 140, 140);
+bplus_tree_insert(tree, 145, 145);
+bplus_tree_insert(tree, 150, 150);
+bplus_tree_insert(tree, 155, 155);
+bplus_tree_insert(tree, 160, 160);
+bplus_tree_insert(tree, 165, 165);
+bplus_tree_insert(tree, 170, 170);
+bplus_tree_insert(tree, 175, 175);
+bplus_tree_insert(tree, 180, 180);
+bplus_tree_insert(tree, 185, 185);
+bplus_tree_insert(tree, 190, 190);
+bplus_tree_insert(tree, 195, 195);
+bplus_tree_insert(tree, 200, 200);
+bplus_tree_insert(tree, -4, -4);
+bplus_tree_insert(tree, -9, -9);
+bplus_tree_insert(tree, -14, -14);
+bplus_tree_insert(tree, -19, -19);
+bplus_tree_insert(tree, -24, -24);
+bplus_tree_insert(tree, -29, -29);
+bplus_tree_insert(tree, -34, -34);
+bplus_tree_insert(tree, -39, -39);
+bplus_tree_insert(tree, -44, -44);
+bplus_tree_insert(tree, -49, -49);
+bplus_tree_insert(tree, -54, -54);
+bplus_tree_insert(tree, -59, -59);
+bplus_tree_insert(tree, -64, -64);
+bplus_tree_insert(tree, -69, -69);
+bplus_tree_insert(tree, -74, -74);
+bplus_tree_insert(tree, -79, -79);
+bplus_tree_insert(tree, -84, -84);
+bplus_tree_insert(tree, -89, -89);
+bplus_tree_insert(tree, -94, -94);
+bplus_tree_insert(tree, -99, -99);
+bplus_tree_insert(tree, -104, -104);
+bplus_tree_insert(tree, -109, -109);
+bplus_tree_insert(tree, -114, -114);
+bplus_tree_insert(tree, -119, -119);
+bplus_tree_insert(tree, -124, -124);
+bplus_tree_insert(tree, -129, -129);
+bplus_tree_insert(tree, -134, -134);
+bplus_tree_insert(tree, -139, -139);
+bplus_tree_insert(tree, -144, -144);
+bplus_tree_insert(tree, -149, -149);
+bplus_tree_insert(tree, -154, -154);
+bplus_tree_insert(tree, -159, -159);
+bplus_tree_insert(tree, -164, -164);
+bplus_tree_insert(tree, -169, -169);
+bplus_tree_insert(tree, -174, -174);
+bplus_tree_insert(tree, -179, -179);
+bplus_tree_insert(tree, -184, -184);
+bplus_tree_insert(tree, -189, -189);
+bplus_tree_insert(tree, -194, -194);
+bplus_tree_insert(tree, -199, -199);
+bplus_tree_insert(tree, -2, -2);
+bplus_tree_insert(tree, -7, -7);
+bplus_tree_insert(tree, -12, -12);
+bplus_tree_insert(tree, -17, -17);
+bplus_tree_insert(tree, -22, -22);
+bplus_tree_insert(tree, -27, -27);
+bplus_tree_insert(tree, -32, -32);
+bplus_tree_insert(tree, -37, -37);
+bplus_tree_insert(tree, -42, -42);
+bplus_tree_insert(tree, -47, -47);
+bplus_tree_insert(tree, -52, -52);
+bplus_tree_insert(tree, -57, -57);
+bplus_tree_insert(tree, -62, -62);
+bplus_tree_insert(tree, -67, -67);
+bplus_tree_insert(tree, -72, -72);
+bplus_tree_insert(tree, -77, -77);
+bplus_tree_insert(tree, -82, -82);
+bplus_tree_insert(tree, -87, -87);
+bplus_tree_insert(tree, -92, -92);
+bplus_tree_insert(tree, -97, -97);
+bplus_tree_insert(tree, -102, -102);
+bplus_tree_insert(tree, -107, -107);
+bplus_tree_insert(tree, -112, -112);
+bplus_tree_insert(tree, -117, -117);
+bplus_tree_insert(tree, -122, -122);
+bplus_tree_insert(tree, -127, -127);
+bplus_tree_insert(tree, -132, -132);
+bplus_tree_insert(tree, -137, -137);
+bplus_tree_insert(tree, -142, -142);
+bplus_tree_insert(tree, -147, -147);
+bplus_tree_insert(tree, -152, -152);
+bplus_tree_insert(tree, -157, -157);
+bplus_tree_insert(tree, -162, -162);
+bplus_tree_insert(tree, -167, -167);
+bplus_tree_insert(tree, -172, -172);
+bplus_tree_insert(tree, -177, -177);
+bplus_tree_insert(tree, -182, -182);
+bplus_tree_insert(tree, -187, -187);
+bplus_tree_insert(tree, -192, -192);
+bplus_tree_insert(tree, -197, -197);
+bplus_tree_insert(tree, -3, -3);
+bplus_tree_insert(tree, -8, -8);
+bplus_tree_insert(tree, -13, -13);
+bplus_tree_insert(tree, -18, -18);
+bplus_tree_insert(tree, -23, -23);
+bplus_tree_insert(tree, -28, -28);
+bplus_tree_insert(tree, -33, -33);
+bplus_tree_insert(tree, -38, -38);
+bplus_tree_insert(tree, -43, -43);
+bplus_tree_insert(tree, -48, -48);
+bplus_tree_insert(tree, -53, -53);
+bplus_tree_insert(tree, -58, -58);
+bplus_tree_insert(tree, -63, -63);
+bplus_tree_insert(tree, -68, -68);
+bplus_tree_insert(tree, -73, -73);
+bplus_tree_insert(tree, -78, -78);
+bplus_tree_insert(tree, -83, -83);
+bplus_tree_insert(tree, -88, -88);
+bplus_tree_insert(tree, -93, -93);
+bplus_tree_insert(tree, -98, -98);
+bplus_tree_insert(tree, -103, -103);
+bplus_tree_insert(tree, -108, -108);
+bplus_tree_insert(tree, -113, -113);
+bplus_tree_insert(tree, -118, -118);
+bplus_tree_insert(tree, -123, -123);
+bplus_tree_insert(tree, -128, -128);
+bplus_tree_insert(tree, -133, -133);
+bplus_tree_insert(tree, -138, -138);
+bplus_tree_insert(tree, -143, -143);
+bplus_tree_insert(tree, -148, -148);
+bplus_tree_insert(tree, -153, -153);
+bplus_tree_insert(tree, -158, -158);
+bplus_tree_insert(tree, -163, -163);
+bplus_tree_insert(tree, -168, -168);
+bplus_tree_insert(tree, -173, -173);
+bplus_tree_insert(tree, -178, -178);
+bplus_tree_insert(tree, -183, -183);
+bplus_tree_insert(tree, -188, -188);
+bplus_tree_insert(tree, -193, -193);
+bplus_tree_insert(tree, -198, -198);
+bplus_tree_insert(tree, -1, -1);
+bplus_tree_insert(tree, -6, -6);
+bplus_tree_insert(tree, -11, -11);
+bplus_tree_insert(tree, -16, -16);
+bplus_tree_insert(tree, -21, -21);
+bplus_tree_insert(tree, -26, -26);
+bplus_tree_insert(tree, -31, -31);
+bplus_tree_insert(tree, -36, -36);
+bplus_tree_insert(tree, -41, -41);
+bplus_tree_insert(tree, -46, -46);
+bplus_tree_insert(tree, -51, -51);
+bplus_tree_insert(tree, -56, -56);
+bplus_tree_insert(tree, -61, -61);
+bplus_tree_insert(tree, -66, -66);
+bplus_tree_insert(tree, -71, -71);
+bplus_tree_insert(tree, -76, -76);
+bplus_tree_insert(tree, -81, -81);
+bplus_tree_insert(tree, -86, -86);
+bplus_tree_insert(tree, -91, -91);
+bplus_tree_insert(tree, -96, -96);
+bplus_tree_insert(tree, -101, -101);
+bplus_tree_insert(tree, -106, -106);
+bplus_tree_insert(tree, -111, -111);
+bplus_tree_insert(tree, -116, -116);
+bplus_tree_insert(tree, -121, -121);
+bplus_tree_insert(tree, -126, -126);
+bplus_tree_insert(tree, -131, -131);
+bplus_tree_insert(tree, -136, -136);
+bplus_tree_insert(tree, -141, -141);
+bplus_tree_insert(tree, -146, -146);
+bplus_tree_insert(tree, -151, -151);
+bplus_tree_insert(tree, -156, -156);
+bplus_tree_insert(tree, -161, -161);
+bplus_tree_insert(tree, -166, -166);
+bplus_tree_insert(tree, -171, -171);
+bplus_tree_insert(tree, -176, -176);
+bplus_tree_insert(tree, -181, -181);
+bplus_tree_insert(tree, -186, -186);
+bplus_tree_insert(tree, -191, -191);
+bplus_tree_insert(tree, -196, -196);
+bplus_tree_insert(tree, -5, -5);
+bplus_tree_insert(tree, -10, -10);
+bplus_tree_insert(tree, -15, -15);
+bplus_tree_insert(tree, -20, -20);
+bplus_tree_insert(tree, -25, -25);
+bplus_tree_insert(tree, -30, -30);
+bplus_tree_insert(tree, -35, -35);
+bplus_tree_insert(tree, -40, -40);
+bplus_tree_insert(tree, -45, -45);
+bplus_tree_insert(tree, -50, -50);
+bplus_tree_insert(tree, -55, -55);
+bplus_tree_insert(tree, -60, -60);
+bplus_tree_insert(tree, -65, -65);
+bplus_tree_insert(tree, -70, -70);
+bplus_tree_insert(tree, -75, -75);
+bplus_tree_insert(tree, -80, -80);
+bplus_tree_insert(tree, -85, -85);
+bplus_tree_insert(tree, -90, -90);
+bplus_tree_insert(tree, -95, -95);
+bplus_tree_insert(tree, -100, -100);
+bplus_tree_insert(tree, -105, -105);
+bplus_tree_insert(tree, -110, -110);
+bplus_tree_insert(tree, -115, -115);
+bplus_tree_insert(tree, -120, -120);
+bplus_tree_insert(tree, -125, -125);
+bplus_tree_insert(tree, -130, -130);
+bplus_tree_insert(tree, -135, -135);
+bplus_tree_insert(tree, -140, -140);
+bplus_tree_insert(tree, -145, -145);
+bplus_tree_insert(tree, -150, -150);
+bplus_tree_insert(tree, -155, -155);
+bplus_tree_insert(tree, -160, -160);
+bplus_tree_insert(tree, -165, -165);
+bplus_tree_insert(tree, -170, -170);
+bplus_tree_insert(tree, -175, -175);
+bplus_tree_insert(tree, -180, -180);
+bplus_tree_insert(tree, -185, -185);
+bplus_tree_insert(tree, -190, -190);
+bplus_tree_insert(tree, -195, -195);
+bplus_tree_insert(tree, -200, -200);
 
   print_tree(tree);
 
-  bplus_tree_insert(tree, 1, 1);
+  printf("\n******************************\n");
+
+  /********************
+   * DELETE TEST CASE *
+   * ******************/
+  printf("Delete key\n");
+
   print_tree(tree);
 
-  
-  bplus_tree_delete(&tree);
-}
+  printf("\n******************************\n");
+ 
+  /********************
+   * SEARCH TEST CASE *
+   ********************/ 
+  printf("Search keys\n");
+  key = 1;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = -4;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = -5;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = -6;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = 6;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = 7;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = 8;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = 0;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = -1;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  key = 1;
+  printf("Key: %d", key);
+  if (bplus_tree_search_key(tree, key, &data)) {
+		  printf("Key: %d   data: %f\n", key, data);
+  } else {
+		 printf("Key not found\n");
+  }
+  printf("\n******************************\n");
+
+  /**************************
+   * RANGE SEARCH TEST CASE *
+   **************************/
+  printf("Range Search\n");
+  bplus_tree_range_search (tree, -3, 6);
+
+
+  //bplus_tree_delete(&tree);
+#endif
+ }
