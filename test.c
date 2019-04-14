@@ -6,39 +6,59 @@ main ()
         int i = 1;
 /*
         for (i = 4; i <= 200; i = i + 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
+	
         for (i = 2; i <= 200; i = i + 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = 3; i <= 200; i = i + 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = 1; i <= 200; i = i + 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = 0; i <= 200; i = i + 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
 
         for (i = -4; i >= -200; i = i - 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = -2; i >= -200; i = i - 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = -3; i >= -200; i = i - 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = -1; i >= -200; i = i - 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
         for (i = -0; i >= -200; i = i - 5) {
-                printf("bplus_tree_insert(tree, %d, %d);\n", i, i);
+                printf("Insert(%d, %f)\n", i, ((0.1 * i)/05));
         }
-*/
-        for (i = 100; i <= 200; i = i+1) {
-                printf("bplus_tree_delete_key(tree, %d);\n", i);
+
+        for (i = 4; i <= 200; i = i + 5) {
+                printf("Delete (%d)\n", i);
         }
+        for (i = 0; i <= 200; i = i + 5) {
+                printf("Delete (%d)\n", i);
+        }
+        for (i = -3; i >= -200; i = i - 5) {
+                printf("Delete (%d)\n", i);
+        }
+        for (i = 1; i <= 200; i = i + 5) {
+                printf("Delete (%d)\n", i);
+        }
+        for (i = -2; i >= 200; i = i - 5) {
+                printf("Delete (%d)\n", i);
+        }
+
+	*/
+
+        for (i = -10; i <= 15; i = i + 1) {
+                printf("Delete (%d)\n", i);
+        }
+
 
 }                                            
