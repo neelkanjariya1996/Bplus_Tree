@@ -7,7 +7,8 @@
 #include <sys/types.h>
 #include "bplus_tree.h"
 
-#define MAX	100		// Buffer size of strtok
+#define MAX				100				// Buffer size of strtok
+#define MAX_FILE_NAME	256				// Maximum input file name
 
 /*
  * forward declarations
@@ -28,8 +29,8 @@ delete_key_from_node (bplus_tree_node_t *root,
  * global variables *
  ********************/
 bplus_tree_t    *tree;
-FILE *ip;			// File pointer for the input file
-FILE *op;			// File pointer for the output file
+FILE 			*ip;			// File pointer for the input file
+FILE 			*op;			// File pointer for the output file
 
 /************************
  * Queue data structure *
@@ -61,10 +62,10 @@ create_queue ()
     return (NULL);
   }
 
-  new_queue->head = NULL;
-  new_queue->tail = NULL;
-  new_queue->is_empty = 1;
-  new_queue->size = 0;
+  new_queue->head 		= NULL;
+  new_queue->tail 		= NULL;
+  new_queue->is_empty 	= 1;
+  new_queue->size 		= 0;
 
   return new_queue;
 }
@@ -98,7 +99,7 @@ enqueue (queue_t *q, void *data)
   }
 
   q->tail->next = new_node;
-  q->tail = new_node;
+  q->tail 		= new_node;
   q->size++;
   return;
 }
@@ -106,7 +107,7 @@ enqueue (queue_t *q, void *data)
 void *
 dequeue (queue_t *q)
 {
-  void *data = NULL;
+  void *data 	= NULL;
   qnode_t *node = NULL;
 
   if (!q)
@@ -120,7 +121,7 @@ dequeue (queue_t *q)
 
   if (!q->head) {
     q->is_empty = 1;
-    q->tail = NULL;
+    q->tail 	= NULL;
   }
 
   data = node->data;
@@ -140,8 +141,8 @@ dequeue (queue_t *q)
 void
 print_index_node (bplus_tree_node_t *node)
 {
-  int num = 0;
-  int i = 0;
+  int num 	= 0;
+  int i 	= 0;
   int *keys = NULL;
 
   if (!node)
@@ -167,8 +168,8 @@ print_index_node (bplus_tree_node_t *node)
 void
 print_leaf_node (bplus_tree_node_t *node)
 {
-  int i = 0;
-  int num = 0;
+  int i 		= 0;
+  int num 		= 0;
   pair_t *pairs = NULL;
 
   if (!node)
@@ -232,7 +233,7 @@ print_tree_util (bplus_tree_node_t *root)
         print_leaf_node(node);
       } else {
        
-        int i = 0;
+        int i 	= 0;
         int num = node->u.index->num;
         
         print_index_node(node);
@@ -319,7 +320,7 @@ bplus_tree_create_leaf_node ()
     memset(new_lnode, 0, sizeof(leaf_node_t));
     new_lnode->prev = NULL;
     new_lnode->next = NULL;
-    new_lnode->num = 0;
+    new_lnode->num 	= 0;
 
     /*
      * allocate an array for the <kev, value> pair
@@ -476,7 +477,7 @@ bplus_tree_delete(bplus_tree_t **tree)
         return;
 
     if (!is_tree_empty(*tree)) {
-        printf("%s>Error: trying to free a non-empty tree\n", __FUNCTION__);
+        printf("%sError: trying to free a non-empty tree\n", __FUNCTION__);
         return;
     }
     
@@ -502,7 +503,7 @@ bplus_tree_create (int order)
 
     memset(new_tree, 0, sizeof(bplus_tree_t));
     new_tree->order = order;
-    new_tree->root = NULL;
+    new_tree->root 	= NULL;
 
     return (new_tree);
 }
@@ -705,14 +706,14 @@ bplus_tree_range_search_in_leaf (bplus_tree_node_t *root,
                                  int high_key)
 {
   
-  bplus_tree_node_t *head = NULL;
-  int lowest_key_in_leaf = -1;
-  int highest_key_in_leaf = -1;
-  int i = 0;
-  int num = 0;
-  int index = 0;
+  bplus_tree_node_t *head 	= NULL;
+  int lowest_key_in_leaf 	= -1;
+  int highest_key_in_leaf 	= -1;
+  int i 					= 0;
+  int num 					= 0;
+  int index 				= 0;
+  bool found 				= false;
   pair_t *pairs;
-  bool found = false;
 
   if (!root->is_leaf) {
     
@@ -830,9 +831,9 @@ index_node_add_key (index_node_t *node, int key)
 {
   int num = 0;
 
-  num = node->num;
+  num 				= node->num;
   node->keys[num++] = key;
-  node->num = num;
+  node->num 		= num;
 }
 
 /*
@@ -843,7 +844,7 @@ leaf_node_add_pair (leaf_node_t *node, int key, float value)
 {
   int num = 0;
 
-  num = node->num;
+  num 					= node->num;
   node->pairs[num].key = key;
   node->pairs[num].data = value;
   node->num++;
@@ -931,8 +932,8 @@ insert_into_non_full_leaf (bplus_tree_node_t *node,
                            int key,
                            float value)
 {
-  int i = 0;
-  int num = 0;
+  int i 		= 0;
+  int num 		= 0;
   pair_t *pairs = NULL;
 
   if (!node) {
@@ -949,11 +950,11 @@ insert_into_non_full_leaf (bplus_tree_node_t *node,
   num = node->u.leaf->num;
   for (i = num - 1; (i >= 0 && (pairs[i].key > key)); i--) {
 
-    pairs[i + 1].key = pairs[i].key;
-    pairs[i + 1].data = pairs[i].data;
+    pairs[i + 1].key 	= pairs[i].key;
+    pairs[i + 1].data 	= pairs[i].data;
   }
 
-  pairs[i + 1].key = key;
+  pairs[i + 1].key 	= key;
   pairs[i + 1].data = value;
   node->u.leaf->num++;
 
@@ -972,11 +973,11 @@ insert_key_into_non_full_parent (bplus_tree_node_t *parent,
                                  bplus_tree_node_t *new_leaf,
                                  int key)
 {
-  int i = 0;
-  int j = 0;
-  int num = 0;
-  int *keys = NULL;
-  void **child = NULL;
+  int i 		= 0;
+  int j 		= 0;
+  int num 		= 0;
+  int *keys 	= NULL;
+  void **child 	= NULL;
 
   if (!parent || !leaf || !new_leaf) {
     printf("%s: Error: Invalid args\n", __FUNCTION__);
@@ -1008,8 +1009,8 @@ insert_key_into_non_full_parent (bplus_tree_node_t *parent,
     child[j + 1] = child[j];
   }
 
-  keys[i + 1] = key;
-  child[j + 1] = new_leaf;
+  keys[i + 1] 	= key;
+  child[j + 1] 	= new_leaf;
   parent->u.index->num++;
 
   return;
@@ -1027,15 +1028,15 @@ insert_key_into_full_parent (bplus_tree_node_t *root,
                              int key)
 {
   int i = 0, j = 0, k = 0, l = 0;
-  int num_tmp_keys = 0;
-  int num = 0;
-  int promote_key = 0; //key which will be promoted
-  int *keys = NULL; //keys in parent
-  void **child = NULL; //child pointers in parent
-  int *new_keys = NULL; //keys in new_node
-  void **new_child = NULL; //child pointers in new_node
-  int tmp_keys[tree->order]; //hold all keys in parent + new key
-  void *tmp_child[tree->order + 1]; //hold all children in parent + new_leaf
+  int num_tmp_keys 	= 0;
+  int num 			= 0;
+  int promote_key 	= 0; 				//key which will be promoted
+  int *keys 		= NULL; 			//keys in parent
+  void **child 		= NULL; 			//child pointers in parent
+  int *new_keys 	= NULL; 			//keys in new_node
+  void **new_child 	= NULL; 			//child pointers in new_node
+  int tmp_keys[tree->order]; 			//hold all keys in parent + new key
+  void *tmp_child[tree->order + 1]; 	//hold all children in parent + new_leaf
   bplus_tree_node_t *new_node = NULL;
 
   if (!root || !parent || !leaf || !new_leaf) {
@@ -1058,10 +1059,10 @@ insert_key_into_full_parent (bplus_tree_node_t *root,
   memset(tmp_keys, 0, sizeof(tmp_keys));
   memset(tmp_child, 0, sizeof(tmp_child));
 
-  keys = parent->u.index->keys;
-  child = parent->u.index->child;
-  num = parent->u.index->num;
-  num_tmp_keys = num + 1;
+  keys 			= parent->u.index->keys;
+  child 		= parent->u.index->child;
+  num 			= parent->u.index->num;
+  num_tmp_keys 	= num + 1;
 
   /*
    * copy all the keys from parent  which are less than key in tmp_keys
@@ -1133,7 +1134,7 @@ insert_key_into_full_parent (bplus_tree_node_t *root,
   /*
    * copy rest of the half in new node
    */
-  new_keys = new_node->u.index->keys;
+  new_keys 	= new_node->u.index->keys;
   new_child = new_node->u.index->child;
   for (i = (tree->order/2 + 1), j = 0; i < num_tmp_keys; i++, j++) {
     
@@ -1148,7 +1149,7 @@ insert_key_into_full_parent (bplus_tree_node_t *root,
     new_child[j] = tmp_child[i];
 
     /* we have a new parent for this child pointers */
-    tmp = new_child[j];
+    tmp 		= new_child[j];
     tmp->parent = new_node;
   }
 
@@ -1164,8 +1165,8 @@ adjust_parent (bplus_tree_node_t *root,
              bplus_tree_node_t *new_leaf,
              int parent_key)
 {
-  bplus_tree_node_t *new_node = NULL;
-  bplus_tree_node_t *parent = NULL;
+  bplus_tree_node_t *new_node 	= NULL;
+  bplus_tree_node_t *parent 	= NULL;
 
   parent = leaf->parent;
 
@@ -1196,8 +1197,8 @@ adjust_parent (bplus_tree_node_t *root,
     new_node->u.index->child[1] = new_leaf;
     
     /* we have a new parent for leaf and new leaf */
-    leaf->parent = new_node;
-    new_leaf->parent = new_node;
+    leaf->parent 		= new_node;
+    new_leaf->parent 	= new_node;
     return (new_node);
   }
 
@@ -1226,14 +1227,14 @@ insert_into_full_leaf (bplus_tree_node_t *root,
                        int key,
                        float value)
 {
-  int i = 0 ;
-  int j = 0;
-  int num = 0;
-  int promote_key = 0;
-  bplus_tree_node_t *new_leaf = NULL;
+  int i 			= 0 ;
+  int j 			= 0;
+  int num 			= 0;
+  int promote_key 	= 0;
   pair_t tmp_pairs[tree->order];
-  pair_t *pairs = NULL;
-  pair_t *new_pairs = NULL;
+  bplus_tree_node_t *new_leaf 	= NULL;
+  pair_t *pairs 				= NULL;
+  pair_t *new_pairs 			= NULL;
 
   if (!node) {
     printf("%s: Error: invalid node\n", __FUNCTION__);
@@ -1261,20 +1262,20 @@ insert_into_full_leaf (bplus_tree_node_t *root,
   /*
    * change the doubly link list
    */
-  new_leaf->u.leaf->next = node->u.leaf->next;
-  node->u.leaf->next = new_leaf;
-  new_leaf->u.leaf->prev = node;
+  new_leaf->u.leaf->next 	= node->u.leaf->next;
+  node->u.leaf->next 		= new_leaf;
+  new_leaf->u.leaf->prev 	= node;
   if (new_leaf->u.leaf->next) {
     bplus_tree_node_t *tmp = NULL;
 
-    tmp = new_leaf->u.leaf->next;
-    tmp->u.leaf->prev = new_leaf;
+    tmp 				= new_leaf->u.leaf->next;
+    tmp->u.leaf->prev 	= new_leaf;
   }
 
   /*
    * transfer half of the pairs to new leaf
    */
-  num = node->u.leaf->num;
+  num 	= node->u.leaf->num;
   pairs = node->u.leaf->pairs;
   i = 0; //index in tmp_pairs
   j = 0; //index in original leaf
@@ -1285,7 +1286,7 @@ insert_into_full_leaf (bplus_tree_node_t *root,
   }
 
   /* copy the new <key, value> in right location */
-  tmp_pairs[i].key = key;
+  tmp_pairs[i].key 	= key;
   tmp_pairs[i].data = value;
   i++;
 
@@ -1345,9 +1346,9 @@ bplus_tree_insert_internal (bplus_tree_node_t **root,
                             int key,
                             float value)
 {
-  int index = 0;
-  float data = 0;
-  bplus_tree_node_t *leaf = NULL;
+  int index 				= 0;
+  float data 				= 0;
+  bplus_tree_node_t *leaf 	= NULL;
 
   /*
    * empty tree:
@@ -1540,9 +1541,9 @@ static void
 adjust_leaf_node (bplus_tree_node_t *node,
                   int key)
 {
-  int i = 0;
-  int index = 0;
-  int num = 0;
+  int i 		= 0;
+  int index 	= 0;
+  int num 		= 0;
   pair_t *pairs = NULL;
 
   if (!node->is_leaf) {
@@ -1577,11 +1578,11 @@ adjust_index_node (bplus_tree_node_t *node,
                    bplus_tree_node_t *child,
                    int key)
 {
-  int i = 0;
-  int index = 0;
-  int num = 0;
-  int *keys = NULL;
-  void **children = NULL;
+  int i 			= 0;
+  int index 		= 0;
+  int num 			= 0;
+  int *keys 		= NULL;
+  void **children 	= NULL;
 
   if (node->is_leaf) {
     printf("%s: Error: leaf node\n", __FUNCTION__);
@@ -1589,8 +1590,8 @@ adjust_index_node (bplus_tree_node_t *node,
   }
 
   /* adjust the keys */
-  num = node->u.index->num;
-  keys = node->u.index->keys;
+  num 	= node->u.index->num;
+  keys 	= node->u.index->keys;
   index = search_key_index_in_keys(keys, key, 0, num - 1);
   if (index == -1)
     return;
@@ -1600,9 +1601,9 @@ adjust_index_node (bplus_tree_node_t *node,
   }
   
   /* adjust the child pointers */
-  num = node->u.index->num + 1; //one more child then keys
-  children = node->u.index->child;
-  index = search_child_index_in_children(children, child, 0, num -1);
+  num 		= node->u.index->num + 1; //one more child then keys
+  children 	= node->u.index->child;
+  index 	= search_child_index_in_children(children, child, 0, num -1);
   if (index == -1) {
     return;
   }
@@ -1683,10 +1684,10 @@ get_sibling_and_parent_key (bplus_tree_node_t *node,
                             int *parent_key,
                             int *parent_key_index)
 {
-  int i = 0;
-  int num = 0;
-  int *keys = NULL;
-  void **children = NULL;
+  int i 					= 0;
+  int num 					= 0;
+  int *keys 				= NULL;
+  void **children 			= NULL;
   bplus_tree_node_t *parent = NULL;
 
   /*
@@ -1739,16 +1740,16 @@ borrow_and_adjust_leaf_nodes (bplus_tree_node_t *root,
                               int parent_key_index,
                               int parent_key)
 {
-  int i = 0;
-  int num1 = 0;
-  int num2 = 0;
-  pair_t *pairs1 = NULL;
-  pair_t *pairs2 = NULL;
+  int i 			= 0;
+  int num1 			= 0;
+  int num2 			= 0;
+  pair_t *pairs1 	= NULL;
+  pair_t *pairs2 	= NULL;
 
-  num1 = node->u.leaf->num;
-  num2 = sibling->u.leaf->num;
-  pairs1 = node->u.leaf->pairs;
-  pairs2 = sibling->u.leaf->pairs;
+  num1 		= node->u.leaf->num;
+  num2 		= sibling->u.leaf->num;
+  pairs1 	= node->u.leaf->pairs;
+  pairs2 	= sibling->u.leaf->pairs;
   if (sibling_index == -1) {
   
     /*
@@ -1807,23 +1808,23 @@ borrow_and_adjust_index_nodes (bplus_tree_node_t *root,
                                int parent_key)
 {
   int i = 0;
-  int *pkeys = NULL; //keys in parent node
-  int *nkeys = NULL; //keys in node
-  int *skeys = NULL; //keys in sibling
-  void **nchild = NULL; //child pointers in node
-  void **schild = NULL; //child pointers in sibling
-  int nnum = 0; //number of keys in node
-  int snum = 0; //number of keys in sibling
+  int *pkeys 	= NULL;					 //keys in parent node
+  int *nkeys 	= NULL;					 //keys in node
+  int *skeys 	= NULL;					 //keys in sibling
+  void **nchild = NULL;					 //child pointers in node
+  void **schild = NULL;					 //child pointers in sibling
+  int nnum 		= 0; 					 //number of keys in node
+  int snum 		= 0;					 //number of keys in sibling
   bplus_tree_node_t *parent = NULL;
 
-  nnum = node->u.index->num;
-  snum = sibling->u.index->num;
-  nkeys = node->u.index->keys;
-  skeys = sibling->u.index->keys;
-  nchild = node->u.index->child;
-  schild = sibling->u.index->child;
-  parent = node->parent;
-  pkeys = parent->u.index->keys;
+  nnum 		= node->u.index->num;
+  snum 		= sibling->u.index->num;
+  nkeys 	= node->u.index->keys;
+  skeys 	= sibling->u.index->keys;
+  nchild 	= node->u.index->child;
+  schild 	= sibling->u.index->child;
+  parent 	= node->parent;
+  pkeys 	= parent->u.index->keys;
 
   if (sibling_index == -1) {
 
@@ -1837,14 +1838,14 @@ borrow_and_adjust_index_nodes (bplus_tree_node_t *root,
      * borrow the parent key in the node
      * also adjust child pointers accordingly
      */
-    nkeys[nnum] = parent_key;
-    nchild[nnum + 1] = schild[0];
+    nkeys[nnum] 		= parent_key;
+    nchild[nnum + 1] 	= schild[0];
 
     /*
      * the child which was just borrowed now has a new parent
      */
-    borrowed_child = (bplus_tree_node_t *)nchild[nnum + 1];
-    borrowed_child->parent = node;
+    borrowed_child 			= (bplus_tree_node_t *)nchild[nnum + 1];
+    borrowed_child->parent 	= node;
 
     /*
      * parent key at the parent_key_index will change to the leftmost key
@@ -1939,17 +1940,17 @@ merge_parent_and_sibling_for_leaf_nodes (bplus_tree_node_t *root,
                                          int parent_key)
 {
   int i = 0, j = 0;
-  int nnum = 0;
-  int snum = 0;
-  pair_t *npairs = NULL;
-  pair_t *spairs = NULL;
+  int nnum 					= 0;
+  int snum 					= 0;
+  pair_t *npairs 			= NULL;
+  pair_t *spairs 			= NULL;
   bplus_tree_node_t *parent = NULL;
 
-  nnum = node->u.leaf->num;
-  snum = sibling->u.leaf->num;
-  npairs = node->u.leaf->pairs;
-  spairs = sibling->u.leaf->pairs;
-  parent = node->parent;
+  nnum 		= node->u.leaf->num;
+  snum 		= sibling->u.leaf->num;
+  npairs 	= node->u.leaf->pairs;
+  spairs 	= sibling->u.leaf->pairs;
+  parent 	= node->parent;
 
   /*
    * we will add all the pairs from node to neigh
@@ -2014,22 +2015,22 @@ merge_parent_and_sibling_for_index_nodes (bplus_tree_node_t *root,
                                           int parent_key)
 {
   int i = 0, j = 0;
-  int nnum = 0 ;
-  int snum = 0;
-  int *nkeys = NULL;
-  int *skeys = NULL;
-  void **nchild = NULL;
-  void **schild = NULL;
-  bplus_tree_node_t *parent = NULL;
-  bplus_tree_node_t *merged_child = NULL;
+  int nnum 							= 0 ;
+  int snum 							= 0;
+  int *nkeys 						= NULL;
+  int *skeys 						= NULL;
+  void **nchild 					= NULL;
+  void **schild 					= NULL;
+  bplus_tree_node_t *parent 		= NULL;
+  bplus_tree_node_t *merged_child 	= NULL;
 
-  nnum = node->u.index->num;
-  snum = sibling->u.index->num;
-  nkeys = node->u.index->keys;
-  skeys = sibling->u.index->keys;
-  nchild = node->u.index->child;
-  schild = sibling->u.index->child;
-  parent = node->parent;
+  nnum 		= node->u.index->num;
+  snum 		= sibling->u.index->num;
+  nkeys 	= node->u.index->keys;
+  skeys 	= sibling->u.index->keys;
+  nchild 	= node->u.index->child;
+  schild 	= sibling->u.index->child;
+  parent 	= node->parent;
 
   skeys[snum] = parent_key;
   snum = ++sibling->u.index->num;
@@ -2038,8 +2039,8 @@ merge_parent_and_sibling_for_index_nodes (bplus_tree_node_t *root,
   i = snum;
   j = 0;
   while (j < nnum) {
-    skeys[i] = nkeys[j];
-    schild[i] = nchild[j];
+    skeys[i] 	= nkeys[j];
+    schild[i] 	= nchild[j];
     sibling->u.index->num++;
     node->u.index->num--;
 
@@ -2051,8 +2052,8 @@ merge_parent_and_sibling_for_index_nodes (bplus_tree_node_t *root,
   }
 
   /* onde more child */
-  schild[i] = nchild[j];
-  merged_child = (bplus_tree_node_t *)nchild[j];
+  schild[i] 	= nchild[j];
+  merged_child 	= (bplus_tree_node_t *)nchild[j];
   merged_child->parent = sibling;
 
   root = delete_key_from_node(root, parent, node, parent_key); 
@@ -2074,8 +2075,8 @@ merge_parent_and_sibling (bplus_tree_node_t *root,
   bplus_tree_node_t *tmp = NULL;
 
   if (sibling_index == -1) {
-    tmp = node;
-    node = sibling;
+    tmp 	= node;
+    node 	= sibling;
     sibling = tmp;
   }
   
@@ -2097,10 +2098,10 @@ delete_key_from_node (bplus_tree_node_t *root,
                       bplus_tree_node_t *child,
                       int key)
 {
-  int parent_key = 0;
-  int parent_key_index = 0;
-  int sibling_index = 0;
-  bplus_tree_node_t *sibling = NULL;
+  int parent_key 				= 0;
+  int parent_key_index 			= 0;
+  int sibling_index 			= 0;
+  bplus_tree_node_t *sibling 	= NULL;
 
   if (!root)
     return (root);
@@ -2221,10 +2222,10 @@ parser ()
   
   char str[100];
   char *pch;
-  int key 	= 0;
+  int key 		= 0;
   float data 	= 0;
   double value 	= 0;
-  int ret 	= 0;
+  int ret 		= 0;
   int low_key 	= 0;
   int high_key 	= 0;
 
@@ -2269,7 +2270,7 @@ parser ()
 	 * to Insert then it calls the
 	 * bplus_tree_insert(tree, key, &data) function
 	 */
-	if (!(strncmp(pch, "Insert", 6))) {
+	if ((!(strncmp(pch, "Insert", 6))) || (!strncmp(pch, "insert", 6))) {
 	
 		pch = strtok (NULL, " ,()\n\r");
 		/*
@@ -2315,7 +2316,7 @@ parser ()
 	 * to Delete then it calls the
 	 * bplus_tree_delete_key(tree, key) function
 	 */
-	if (!(strncmp(pch, "Delete", 6))) {
+	if ((!(strncmp(pch, "Delete", 6))) || (!strncmp(pch, "delete", 6))) {
 
 		pch = strtok (NULL, "( )\n\r");
 		/*
@@ -2355,7 +2356,7 @@ parser ()
 	 * bplus_tree_range_search(tree, low_key, high_key)
 	 *function according to the input
 	 */
-	if (!(strncmp(pch, "Search", 6))) {
+	if ((!(strncmp(pch, "Search", 6))) || (!(strncmp(pch, "search", 6)))) {
 
 		pch = strtok (NULL, " ,()\n\r");
 		/*
@@ -2408,6 +2409,8 @@ parser ()
 		continue;
 	}
 
+	printf("Invalid input. The allowed inputs are- Initialize(), Insert(), Delete(), Search()\n");
+
   }
 
 }
@@ -2416,13 +2419,22 @@ parser ()
  * Driver function  *
  ********************/
 int
-main ()
+main (int argc, char* argv[])
 {
+
+  char input_file_name[MAX_FILE_NAME];
+
+  if (argc > 2) {
+  		printf("Error: Unexpected command line argument passed\n");
+		return 0;
+  }
+
+  strcpy(input_file_name, argv[1]);
 
   /*
    * OPening the input file
    */
-  ip = fopen("input.txt", "r");
+  ip = fopen(input_file_name, "r");
   /*
    * Error checking
    * for opening the input file
