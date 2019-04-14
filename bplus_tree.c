@@ -2207,7 +2207,7 @@ main ()
 */  
   op = fopen("output_file.txt", "w");
   inp = fopen("input.txt", "r");
-  while (ret = fgets(str, 100, inp)) {
+  while (ret = (fgets(str, 100, inp))) {
 		 
 	if (ret == EOF)
 			break;
@@ -2222,14 +2222,20 @@ main ()
 		}
 		continue;
 	}
-
+	
+	printf("String: %s\n", str);
+	printf("PCH: %s\n", pch);
 	if (!(strncmp(pch, "Insert", 6))) {
 	
 		pch = strtok (NULL, " ,()\n");
+		printf("After the first strtok - pch = %s\n", pch);
+		printf("string after first strtok %s\n", str);
 		if (pch != NULL) {
 			key = atoi(pch);
 		}
 		pch = strtok(NULL, ", )\n");
+		printf("After the second strtok - pch = %s\n", pch);
+		printf("string after second strtok %s\n", str);
 		if (pch != NULL) {
 			value = atof(pch);
 		}
@@ -2244,7 +2250,6 @@ main ()
 	if (!(strncmp(pch, "Delete", 6))) {
 
 		pch = strtok (NULL, "( )\n");
-		printf("PCH in delete after strtok: %s", pch);
 		if (pch != NULL) {
 				key = atoi(pch);
 	}
@@ -2272,7 +2277,7 @@ main ()
 		}
 		printf("PCH before second strtok: %s\n", pch);	
 		printf("String before second strtok: %s\n", str);
-		pch = strtok (NULL, ", ()\n");
+		pch = strtok (NULL, ", )\n\r");
 		printf("PCH after second strtok: %s\n", pch);	
 		printf("String after second strtok: %s\n", str);
 		if (pch == NULL) {
@@ -2288,13 +2293,13 @@ main ()
 			high_key = atoi(pch);
 			printf("low key = %d and high key = %d", low_key, high_key);
 			bplus_tree_range_search (tree, low_key, high_key);
-		/*	
+			
 			int char_to_delete = 1;
 			fseeko(op, -char_to_delete, SEEK_END);
 			int position = ftello(op);
 			ftruncate(fileno(op), position);
 			fprintf(op, "\n");
-		*/	
+			
 		}
 		continue;
 	}
