@@ -3,7 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include "bplus_tree.h"
+
+#define MAX	100		// Buffer size of strtok
 
 /*
  * forward declarations
@@ -24,7 +28,8 @@ delete_key_from_node (bplus_tree_node_t *root,
  * global variables *
  ********************/
 bplus_tree_t    *tree;
-FILE *op;
+FILE *ip;			// File pointer for the input file
+FILE *op;			// File pointer for the output file
 
 /************************
  * Queue data structure *
@@ -368,7 +373,6 @@ bplus_tree_create_index_node ()
 
     /*
      * allocate arrays for keys
-     * TODO: this should be order -1
      */
     new_inode->keys = malloc(tree->order * sizeof(int));
     if (!new_inode->keys) {
@@ -403,8 +407,6 @@ bplus_tree_delete_node (bplus_tree_node_t *node)
     if (!node)
         return;
 
-    //TODO: check of empty
-
     if (node->is_leaf) {
         
         bplus_tree_delete_leaf_node(node->u.leaf);
@@ -426,7 +428,7 @@ bplus_tree_create_node (bool is_leaf)
     new_node = malloc(sizeof(bplus_tree_node_t));
     if (!new_node) {
         printf("%s>Error: could not allocate memory for new node\n", __FUNCTION__);
-        return;
+        return (NULL);
     }
 
     memset(new_node, 0, sizeof(bplus_tree_node_t));
@@ -520,7 +522,6 @@ get_child_index_util (int *a,
     int mid = 0;
 
     while (start != end) {
-	//TODO: avoid overflow ?
 	mid = (start + end) / 2;
 	if (a[mid] <= key) {
 	    start = mid + 1;
@@ -673,7 +674,6 @@ bplus_tree_range_search_find_index_in_leaf (pair_t *a,
 
     while (start != end) {
 	
-       //TODO: avoid overflow ?
 	mid = (start + end) / 2;
 
         if (a[mid].key == low_key) {
@@ -1433,7 +1433,7 @@ static bool
 node_is_valid (bplus_tree_node_t *root,
                bplus_tree_node_t *node)
 {
-  //TODO_URGENT:
+  
   int num = 0;
 
   if (node->is_leaf)
@@ -1584,7 +1584,7 @@ adjust_index_node (bplus_tree_node_t *node,
   void **children = NULL;
 
   if (node->is_leaf) {
-    printf("%s: Error: leaf node\n");
+    printf("%s: Error: leaf node\n", __FUNCTION__);
     return;
   }
 
@@ -2163,11 +2163,11 @@ bplus_tree_delete_key_util (bplus_tree_node_t *root,
   bplus_tree_node_t *leaf;
 
   if (!root)
-    return;
+    return (NULL);
 
   leaf = find_leaf_for_key(root, key);
   if (!leaf)
-    return;
+    return (NULL);
 
   return (delete_key_from_node(root, leaf, NULL, key));
 }
@@ -2184,116 +2184,220 @@ bplus_tree_delete_key (bplus_tree_t *tree,
   return;
 }
 
-/********************
- * Driver function  *
- ********************/
-int
-main ()
+/*******************
+ * Parser function *
+ *******************/
+/*
+ * This function is used as a parser
+ * for the input file
+ * This function will call the following
+ * functions for each of the following inputs
+ ************************************************************
+ * 1. Initialie(m)	- bplus_tree_create(order)
+ *    Here, order 	= m
+ ************************************************************
+ * 2. Insert(a, b)	- bplus_tree_insert(tree, key, value)
+ *    Here, key		= a
+ *          value	= b
+ ************************************************************
+ * 3. Delete(a)		- bplus_tree_delete(tree, key)
+ *    Here, key		= a
+ ************************************************************
+ * 4. Search(a)		- bplus_tree_search_key(tree, key, 
+ * 						&data)
+ *    Here, key		= a
+ *    	    data	= The value associated with that key
+ ************************************************************
+ * 5. Search(a,b)	- bplus_tree_range_search(tree, 
+ * 					low_key, high_key)
+ *    Here, low_key	= a
+ *          high_key	= b
+ ************************************************************
+ */
+
+void
+parser ()
 {
-  int key = 0;
-  float data = 0;
-  double value = 0;
-  FILE *inp;
+  
   char str[100];
   char *pch;
-  int ret;
-  int low_key = 0;
-  int high_key = 0;
+  int key 	= 0;
+  float data 	= 0;
+  double value 	= 0;
+  int ret 	= 0;
+  int low_key 	= 0;
+  int high_key 	= 0;
 
-/*
-  tree = bplus_tree_create(5);
-  if (!tree)
-    return -1;
-*/  
-  op = fopen("output_file.txt", "w");
-  inp = fopen("input.txt", "r");
-  while (ret = (fgets(str, 100, inp))) {
-		 
+  while (ret = (fgets(str, MAX, ip))) {
+
+ 	/*
+	 * check if reached the end of file
+	 */	  
 	if (ret == EOF)
-			break;
-	printf("STRING: %s\n", str);
-	pch = strtok(str, "()\n");
+            break;
 
-	if (!(strncmp(pch, "Initialize", 10))) {
+	/*
+	 * Tokenize the input string 
+	 * from the input file
+	 */
+	pch = strtok(str, "()\n\r");
+
+	/* If the token string is equal 
+	 * to Initialize then it calls
+	 * the bplus_tree_create(order) function
+	 */
+	if ((!(strncmp(pch, "Initialize", 10))) || (!strncmp(pch, "initialize", 10))) {
 		pch = strtok(NULL, "()\n");
+		/*
+		 * This tokenizing is done to get
+		 * the order of the tree
+		 */
 		if (pch != NULL) {
-
+			
+			/*
+			 * After we get the order of the tree
+			 * to be created, we call the below function
+			 */
 			tree = bplus_tree_create(atoi(pch));
 		}
 		continue;
+
 	}
 	
-	printf("String: %s\n", str);
-	printf("PCH: %s\n", pch);
+	/*
+	 * If the token string is equal 
+	 * to Insert then it calls the
+	 * bplus_tree_insert(tree, key, &data) function
+	 */
 	if (!(strncmp(pch, "Insert", 6))) {
 	
-		pch = strtok (NULL, " ,()\n");
-		printf("After the first strtok - pch = %s\n", pch);
-		printf("string after first strtok %s\n", str);
+		pch = strtok (NULL, " ,()\n\r");
+		/*
+		 * This tokenizing is done to 
+		 * get the key to be inserted
+		 */
 		if (pch != NULL) {
 			key = atoi(pch);
 		}
-		pch = strtok(NULL, ", )\n");
-		printf("After the second strtok - pch = %s\n", pch);
-		printf("string after second strtok %s\n", str);
+
+		pch = strtok(NULL, ", )\n\r");
+		/*
+		 * This tokenizing is done to 
+		 * get the value associated with
+		 *  the key
+		 */
 		if (pch != NULL) {
 			value = atof(pch);
 		}
 
+		/* 
+		 * After getting the key and the value
+		 * it calls the insert function to 
+		 * insert the key and its value to the tree
+		 */
 		bplus_tree_insert(tree, key, value);
-		printf("\n***********************\n");
-  		print_tree(tree);
-		printf("\n***********************\n");
+		
+		/*
+		 * print_tree(tree) is function
+		 * which prints the created tree
+		 */
+		/*
+		 * printf("\n***********************\n");
+		 * print_tree(tree);
+		 * printf("\n***********************\n");
+		 */
 		continue;
+
 	}
 
+	/*
+	 * If the token string is equal 
+	 * to Delete then it calls the
+	 * bplus_tree_delete_key(tree, key) function
+	 */
 	if (!(strncmp(pch, "Delete", 6))) {
 
-		pch = strtok (NULL, "( )\n");
+		pch = strtok (NULL, "( )\n\r");
+		/*
+		 * This tokenizing is done to 
+		 * get the key to be deleted
+		 * from the tree
+		 */
 		if (pch != NULL) {
 				key = atoi(pch);
-	}
+		}
+
+		/* 
+		 * After getting the key to be deleted
+		 * it calls the delete function to 
+		 * delete the key and its value from the tree
+		 */
 		bplus_tree_delete_key(tree, key);
-		printf("\n***********************\n");
-  		print_tree(tree);
-		printf("\n***********************\n");
+		
+		/*
+		 * print_tree(tree) is function
+		 * which prints the created tree
+		 */
+		/*
+		 * printf("\n***********************\n");
+		 * print_tree(tree);
+		 * printf("\n***********************\n");
+		 */
 		continue;
 
 	}
-
-	printf("String before if: %s\n", str);
-	printf("PCH Outside: %s\n", pch);	
+	
+	/*
+	 * If the token string is equal 
+	 * to Search then it calls either the
+	 * bplus_tree_search_key(tree, key, &data) function
+	 * 					OR
+	 * bplus_tree_range_search(tree, low_key, high_key)
+	 *function according to the input
+	 */
 	if (!(strncmp(pch, "Search", 6))) {
 
-		printf("PCH before first strtok: %s\n", pch);	
-		printf("String before first strtok: %s\n", str);
-		pch = strtok (NULL, " ,()\n");
-		printf("String after first strtok: %s\n", str);
-		printf("PCH after first strtok: %s\n", pch);	
+		pch = strtok (NULL, " ,()\n\r");
+		/*
+		 * This tokenizing is done to 
+		 * get the key to be searched
+		 */
 		if(pch != NULL) {
 				low_key = atoi(pch);
 				key = atoi(pch);
-				printf("Key= %d\n", key);
 		}
-		printf("PCH before second strtok: %s\n", pch);	
-		printf("String before second strtok: %s\n", str);
 		pch = strtok (NULL, ", )\n\r");
-		printf("PCH after second strtok: %s\n", pch);	
-		printf("String after second strtok: %s\n", str);
+		/*
+		 * This tokenizing is done to 
+		 * get either the high_key for the range search or to 
+		 * check whether a normal search key operation is required
+		 */
+		/*
+		 * If the pch is null then the search key function is call
+		 * else the range search function is called 
+		 */
 		if (pch == NULL) {
-				printf("Calling search key\n");
 				bplus_tree_search_key(tree, key, &data);
+				/*
+			     * If the key is found then we write 
+				 * the value associated with the key 
+				 * to the output file else we write 
+				 * Null to the file
+				 */
 				if (bplus_tree_search_key(tree, key, &data)) {
 				    fprintf(op, "%0.2f\n", data);
 				} else {
 				    fprintf(op, "Null\n");
 				}
 		} else if (pch != NULL) {
-			printf("Calling Range search\n");
 			high_key = atoi(pch);
-			printf("low key = %d and high key = %d", low_key, high_key);
 			bplus_tree_range_search (tree, low_key, high_key);
 			
+			/*
+			 * This is done to remove the last comma at the
+			 * end of the range search output written to 
+			 * the file
+			 */
 			int char_to_delete = 1;
 			fseeko(op, -char_to_delete, SEEK_END);
 			int position = ftello(op);
@@ -2306,109 +2410,59 @@ main ()
 
   }
 
-#if 0
-  /********************
-   * INSERT TEST CASE
-   *******************/ 
+}
 
-bplus_tree_insert(tree, -200, -200);
+/********************
+ * Driver function  *
+ ********************/
+int
+main ()
+{
 
-  print_tree(tree);
+  /*
+   * OPening the input file
+   */
+  ip = fopen("input.txt", "r");
+  /*
+   * Error checking
+   * for opening the input file
+   */
+  if (ip == NULL) {
+      
+      printf("Could not open the input file\n");
+      return 0;
+  }
 
-  printf("\n******************************\n");
+  /*
+   * opening the output file 
+   * to which output is to be stored
+   */
+  op = fopen("output_file.txt", "w");
+  /*
+   * Error checking
+   * for opening the output file
+   */
+  if (op == NULL) {
+      
+      printf("Could not open the output file\n");
+      return 0;
+  }
 
-  /********************
-   * DELETE TEST CASE *
-   * ******************/
-  printf("Delete key\n");
+  /*
+   * Calling the parser function 
+   * to evaluate the input file and
+   * call the appropriate functions
+   */
+  parser();
 
-  print_tree(tree);
+  /*
+   * Closing the input file
+   */
+  fclose(ip);
 
-  printf("\n******************************\n");
- 
-  /********************
-   * SEARCH TEST CASE *
-   ********************/ 
-  printf("Search keys\n");
-  key = 1;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = -4;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = -5;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = -6;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = 6;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = 7;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = 8;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = 0;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = -1;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  key = 1;
-  printf("Key: %d", key);
-  if (bplus_tree_search_key(tree, key, &data)) {
-		  printf("Key: %d   data: %f\n", key, data);
-  } else {
-		 printf("Key not found\n");
-  }
-  printf("\n******************************\n");
+  /*
+   * closing the output file
+   */
+  fclose(op);
 
-  /**************************
-   * RANGE SEARCH TEST CASE *
-   **************************/
-  printf("Range Search\n");
-  bplus_tree_range_search (tree, -3, 6);
-
-
-  //bplus_tree_delete(&tree);
-#endif
- }
+}
