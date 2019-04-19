@@ -2222,10 +2222,10 @@ parser ()
   
   char str[100];
   char *pch;
-  int key 		= 0;
+  int key 	= 0;
   float data 	= 0;
   double value 	= 0;
-  int ret 		= 0;
+  int ret 	= 0;
   int low_key 	= 0;
   int high_key 	= 0;
 
@@ -2242,7 +2242,9 @@ parser ()
 	 * from the input file
 	 */
 	pch = strtok(str, "()\n\r");
-
+	
+	if (pch == NULL)
+	    break;
 	/* If the token string is equal 
 	 * to Initialize then it calls
 	 * the bplus_tree_create(order) function
@@ -2423,6 +2425,11 @@ main (int argc, char* argv[])
 {
 
   char input_file_name[MAX_FILE_NAME];
+
+  if (argc == 1) {
+	  printf("Please enter the input file name");
+	  return 0;
+  }
 
   if (argc > 2) {
   		printf("Error: Unexpected command line argument passed\n");
